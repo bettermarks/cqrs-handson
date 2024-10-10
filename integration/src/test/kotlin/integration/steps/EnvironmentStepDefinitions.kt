@@ -32,6 +32,7 @@ import projection.api.projectionRoutes
 import projection.services.serviceModule
 import publisher.api.eventRoutes
 import publisher.api.statusRoutes
+import java.net.ServerSocket
 import java.time.Instant
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation as ClientContentNegotiation
 
@@ -49,7 +50,7 @@ class EnvironmentStepDefinitions : En {
                 applicationEngineEnvironment {
                     connector {
                         host = "localhost"
-                        port = 8888
+                        port = testServerPort
                     }
                     module {
                         install(Koin) {
@@ -90,13 +91,14 @@ class EnvironmentStepDefinitions : En {
     }
 
     companion object {
+        val testServerPort: Int by lazy { ServerSocket(0).use { it.localPort } }
         val client: HttpClient by lazy {
             HttpClient(CIO) {
                 defaultRequest {
                     url {
                         protocol = URLProtocol.HTTP
                         host = "localhost"
-                        port = 8888
+                        port = testServerPort
                     }
                 }
                 install(ClientContentNegotiation) {
